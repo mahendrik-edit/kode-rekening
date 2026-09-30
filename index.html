@@ -14,12 +14,13 @@
         body {
             background-color: #f8f9fa;
         }
-        .container {
+        .container-fluid {
             margin-top: 30px;
             background-color: #ffffff;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 95%;
         }
         h2 {
             color: #0d6efd;
@@ -46,7 +47,7 @@
 </head>
 <body>
 
-    <div class="container">
+    <div class="container-fluid">
         <h2 class="text-center">Standar Harga Satuan (SSH) Kota Malang 2026</h2>
         
         <div class="info-panel">
@@ -56,12 +57,14 @@
         <table id="sshTable" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
             <thead>
                 <tr>
-                    <th>Kelompok Barang</th>
+                    <th>Kode Kelompok</th>
+                    <th>Uraian Kelompok Barang</th>
                     <th>Kode Barang</th>
                     <th>Uraian Barang</th>
                     <th>Spesifikasi</th>
                     <th>Satuan</th>
                     <th>Harga Satuan (Rp)</th>
+                    <th>Kode Rekening</th>
                 </tr>
             </thead>
             <tbody>
@@ -92,6 +95,7 @@
                     dataSrc: '' // Karena JSON berupa array langsung
                 },
                 columns: [
+                    { data: 'KODE KELOMPOK BARANG' },
                     { data: 'URAIAN KELOMPOK BARANG' },
                     { data: 'KODE BARANG' },
                     { data: 'URAIAN BARANG' },
@@ -100,7 +104,8 @@
                     { 
                         data: 'HARGA SATUAN',
                         render: $.fn.dataTable.render.number('.', ',', 0, '')
-                    }
+                    },
+                    { data: 'KODE REKENING' }
                 ],
                 language: {
                     url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/id.json' // Bahasa Indonesia
