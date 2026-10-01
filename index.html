@@ -200,6 +200,17 @@ button.kv:active{background:var(--fill)}
 .kv.stack .v{grid-column:1;text-align:left;font-size:17px;white-space:nowrap;overflow-wrap:normal}
 .kv.stack.wrap .v{white-space:normal;overflow-wrap:anywhere}
 .kv.stack .cp{grid-column:2;grid-row:1 / span 2;align-self:center}
+.rk-cap{margin:10px 6px 6px;font-size:12.5px;color:var(--label-2);font-variant-numeric:tabular-nums}
+.rk{display:block;width:100%;position:relative;padding:10px 16px 10px calc(16px + (var(--l) - 1) * 14px)}
+.rk+.rk::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+.rk .c{display:block;font-size:12.5px;color:var(--label-2);font-variant-numeric:tabular-nums}
+.rk .t{display:block;font-size:15.5px;overflow-wrap:anywhere}
+.rk.leaf{background:var(--accent-soft)}
+.rk.leaf .t{font-weight:600}
+.rk.leaf .c{color:var(--accent)}
+.rk.nf .t{color:var(--label-3);font-weight:400}
+button.rk:active{background:var(--fill)}
+.section-title small{font-weight:400;color:var(--label-3);margin-left:6px}
 .variant{display:flex;gap:12px;width:100%;padding:12px 16px;position:relative;align-items:flex-start}
 .variant+.variant::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
 .variant:active{background:var(--fill)}
@@ -598,9 +609,35 @@ function kvBtn(label,val,stack,copyVal){
   if(!val) return '<div class="kv'+(stack?' stack'+(stack==='wrap'?' wrap':''):'')+'"><span class="k">'+label+'</span><span class="v muted" style="white-space:normal">Belum tersedia di data</span></div>';
   return '<button class="kv'+(stack?' stack'+(stack==='wrap'?' wrap':''):'')+'" type="button" data-copy="'+esc(copyVal||val)+'" data-what="'+esc(label)+'"><span class="k">'+label+'</span><span class="v">'+esc(val).replace(/, /g,'<br>')+'</span>'+I.copy+'</button>';
 }
+function rekChain(code){
+  var p=code.trim().split('.');
+  if(p.length===6&&p[4].length===3&&p[5].length===5) p=p.slice(0,4).concat(p[4].slice(1),p[5].slice(1));
+  if(p.length!==6) return [];
+  var out=[];
+  for(var n=1;n<=6;n++){
+    var key=p.slice(0,n).join('.'), txt=(D.rek&&D.rek[key])||'';
+    if(txt||n===6) out.push({key:key,txt:txt,l:n});
+  }
+  return out;
+}
+function rekCodes(it){return it.rek?it.rek.split(',').map(function(x){return x.trim()}).filter(Boolean):[]}
+function rekHTML(it){
+  var codes=rekCodes(it); if(!codes.length) return '';
+  var h='<div class="section-title">Induk kode rekening<small>format SIPD</small></div>';
+  codes.forEach(function(c){
+    var chain=rekChain(c); if(!chain.length) return;
+    if(codes.length>1) h+='<div class="rk-cap">Untuk kode '+esc(c)+'</div>';
+    h+='<div class="group-list">'+chain.map(function(r){
+      var leaf=r.l===6;
+      return '<button class="rk'+(leaf?' leaf':'')+(r.txt?'':' nf')+'" type="button" style="--l:'+r.l+'" data-copy="'+esc(r.key)+'" data-what="Kode rekening">'
+        +'<span class="c">'+esc(r.key)+'</span><span class="t">'+(r.txt?esc(r.txt):'Uraian belum ada di daftar kode rekening')+'</span></button>';
+    }).join('')+'</div>';
+  });
+  return h;
+}
 function summary(it){
   return [it.name, it.spec?('Spesifikasi: '+it.spec):null, 'Harga satuan: '+rupiah(it.price)+' / '+it.unit,
-    'Kode rekening: '+(it.rek||'-'), 'Kode barang: '+it.kb, 'Kode kelompok barang: '+it.gk,'Uraian kelompok barang: '+it.gn].filter(Boolean).join('\n');
+    'Kode rekening: '+(it.rek||'-'), 'Kode barang: '+it.kb, 'Kode kelompok barang: '+it.gk,'Uraian kelompok barang: '+it.gn].concat(rekCodes(it).length?['Induk kode rekening:'].concat(rekChain(rekCodes(it)[0]).map(function(r){return r.key+' '+(r.txt||'-')})):[]).filter(Boolean).join('\n');
 }
 function detailInner(it){
   var vars=(byName.get(it.nk)||[]).filter(function(x){return x!==it}).slice(0,25);
@@ -613,6 +650,7 @@ function detailInner(it){
     +'<div class="section-title">Kode</div><div class="group-list">'
       +kvBtn('Kode rekening',it.rek,true)+kvBtn('Kode barang',it.kb,true)+kvBtn('Kode kelompok barang',it.gk,true)+kvBtn('Uraian kelompok barang',it.gn,'wrap')
     +'</div>'
+    +rekHTML(it)
     +'<div class="section-title">Informasi</div><div class="group-list">'
       +'<div class="kv"><span class="k">Satuan</span><span class="v">'+esc(it.unit)+'</span></div>'
       +kvBtn('ID harga',String(it.id))
