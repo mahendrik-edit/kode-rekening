@@ -198,6 +198,7 @@ button.kv:active{background:var(--fill)}
 .kv.stack{display:grid;grid-template-columns:1fr auto;column-gap:14px;row-gap:2px;padding:11px 16px}
 .kv.stack .k{grid-column:1;width:auto;font-size:13px}
 .kv.stack .v{grid-column:1;text-align:left;font-size:17px;white-space:nowrap;overflow-wrap:normal}
+.kv.stack.wrap .v{white-space:normal;overflow-wrap:anywhere}
 .kv.stack .cp{grid-column:2;grid-row:1 / span 2;align-self:center}
 .variant{display:flex;gap:12px;width:100%;padding:12px 16px;position:relative;align-items:flex-start}
 .variant+.variant::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
@@ -594,12 +595,12 @@ io.observe($('#sentinel'));
 
 /* ---------- detail ---------- */
 function kvBtn(label,val,stack,copyVal){
-  if(!val) return '<div class="kv'+(stack?' stack':'')+'"><span class="k">'+label+'</span><span class="v muted" style="white-space:normal">Belum tersedia di data</span></div>';
-  return '<button class="kv'+(stack?' stack':'')+'" type="button" data-copy="'+esc(copyVal||val)+'" data-what="'+esc(label)+'"><span class="k">'+label+'</span><span class="v">'+esc(val).replace(/, /g,'<br>')+'</span>'+I.copy+'</button>';
+  if(!val) return '<div class="kv'+(stack?' stack'+(stack==='wrap'?' wrap':''):'')+'"><span class="k">'+label+'</span><span class="v muted" style="white-space:normal">Belum tersedia di data</span></div>';
+  return '<button class="kv'+(stack?' stack'+(stack==='wrap'?' wrap':''):'')+'" type="button" data-copy="'+esc(copyVal||val)+'" data-what="'+esc(label)+'"><span class="k">'+label+'</span><span class="v">'+esc(val).replace(/, /g,'<br>')+'</span>'+I.copy+'</button>';
 }
 function summary(it){
   return [it.name, it.spec?('Spesifikasi: '+it.spec):null, 'Harga satuan: '+rupiah(it.price)+' / '+it.unit,
-    'Kode rekening: '+(it.rek||'-'), 'Kode barang: '+it.kb, 'Kelompok: '+it.gn+' ('+it.gk+')'].filter(Boolean).join('\n');
+    'Kode rekening: '+(it.rek||'-'), 'Kode barang: '+it.kb, 'Kode kelompok barang: '+it.gk,'Uraian kelompok barang: '+it.gn].filter(Boolean).join('\n');
 }
 function detailInner(it){
   var vars=(byName.get(it.nk)||[]).filter(function(x){return x!==it}).slice(0,25);
@@ -610,10 +611,9 @@ function detailInner(it){
     +'<div class="d-actions"><button class="btn" type="button" data-copy="'+esc(summary(it))+'" data-what="Ringkasan">'+I.copy+' Salin ringkasan</button>'
     +'<button class="btn sec" type="button" id="shareBtn">'+I.share+' Bagikan</button></div>'
     +'<div class="section-title">Kode</div><div class="group-list">'
-      +kvBtn('Kode rekening',it.rek,true)+kvBtn('Kode barang',it.kb,true)+kvBtn('Kode kelompok',it.gk,true)
+      +kvBtn('Kode rekening',it.rek,true)+kvBtn('Kode barang',it.kb,true)+kvBtn('Kode kelompok barang',it.gk,true)+kvBtn('Uraian kelompok barang',it.gn,'wrap')
     +'</div>'
     +'<div class="section-title">Informasi</div><div class="group-list">'
-      +'<div class="kv"><span class="k">Kelompok</span><span class="v">'+esc(it.gn)+'</span></div>'
       +'<div class="kv"><span class="k">Satuan</span><span class="v">'+esc(it.unit)+'</span></div>'
       +kvBtn('ID harga',String(it.id))
     +'</div>';
