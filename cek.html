@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cek Harga SSH dari File RKA</title>
+<style>
+:root{--bg:#f2f2f7;--surface:#fff;--label:#0b0b0f;--label-2:rgba(60,60,67,.68);--sep:rgba(60,60,67,.14);--fill:rgba(118,118,128,.12);
+--accent:#007aff;--soft:rgba(0,122,255,.12);--red:#d70015;--green:#1a8a3a;--amber:#b45f00;
+--font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,Roboto,system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#000;--surface:#1c1c1e;--label:#fff;--label-2:rgba(235,235,245,.62);--sep:rgba(84,84,88,.55);--fill:rgba(118,118,128,.24);--accent:#0a84ff;--soft:rgba(10,132,255,.2);--red:#ff6961;--green:#4cd37a;--amber:#ffb340}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--label);font:16px/1.4 var(--font);-webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.app{max-width:860px;margin:0 auto;padding:20px 16px 56px}
+a{color:var(--accent);text-decoration:none}
+h1{margin:10px 0 4px;font-size:30px;letter-spacing:-.03em}
+.sub{margin:0 0 18px;color:var(--label-2);font-size:15px}
+.card{background:var(--surface);border-radius:20px;padding:16px;margin-bottom:14px}
+.drop{border:2px dashed var(--sep);border-radius:16px;padding:26px 16px;text-align:center;color:var(--label-2);cursor:pointer}
+.drop.on{border-color:var(--accent);background:var(--soft)}
+.drop b{color:var(--label);display:block;font-size:17px;margin-bottom:4px}
+button,select{font:inherit;color:inherit}
+.btn{border:0;border-radius:999px;background:var(--accent);color:#fff;font-weight:600;padding:10px 20px;cursor:pointer}
+.btn.sec{background:var(--fill);color:var(--accent)}
+.file{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 0;border-top:.5px solid var(--sep);font-size:14.5px}
+.file:first-child{border-top:0}.file .n{flex:1;min-width:140px;overflow-wrap:anywhere}
+select{border:.5px solid var(--sep);background:var(--fill);border-radius:10px;padding:6px 8px;max-width:100%}
+.srcs{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:6px;font-size:14.5px}.srcs label{display:flex;gap:6px;align-items:center}
+.note{font-size:13.5px;color:var(--label-2);margin:8px 0 0}
+.sum{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.chip{border:.5px solid var(--sep);background:var(--surface);border-radius:999px;padding:6px 13px;font-size:14px;font-weight:500;cursor:pointer}
+.chip.on{background:var(--soft);color:var(--accent);border-color:transparent}.chip b{font-variant-numeric:tabular-nums}
+.total{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px}
+.total div{background:var(--surface);border-radius:16px;padding:12px 14px}.total small{display:block;color:var(--label-2);font-size:13px}.total strong{font-size:19px;font-variant-numeric:tabular-nums}
+.item{background:var(--surface);border-radius:18px;padding:14px 16px;margin-bottom:10px}
+.top{display:flex;gap:12px;justify-content:space-between;align-items:flex-start}
+.nm{font-weight:600;overflow-wrap:anywhere}.sp{color:var(--label-2);font-size:14.5px;overflow-wrap:anywhere}
+.meta{color:var(--label-2);font-size:13px;margin-top:3px}
+.pill{flex:none;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.p-lebih{background:rgba(215,0,21,.12);color:var(--red)}.p-sesuai{background:rgba(26,138,58,.14);color:var(--green)}
+.p-bawah{background:var(--soft);color:var(--accent)}.p-none{background:var(--fill);color:var(--label-2)}
+.warn{display:inline-block;margin-left:6px;font-size:12px;font-weight:700;color:var(--amber)}
+.cmp{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--fill);font-size:14.5px}
+.cmp .r{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.src{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;margin-right:6px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.s0{--c:#0a6cff}.s1{--c:#168a3a}.s2{--c:#b45f00}.s3{--c:#8a3ffc}
+@media (prefers-color-scheme:dark){.s0{--c:#64a8ff}.s1{--c:#4cd37a}.s2{--c:#ffb340}.s3{--c:#c39bff}}
+details{margin-top:8px;font-size:14px}summary{cursor:pointer;color:var(--accent)}
+.cand{display:flex;gap:8px;align-items:flex-start;width:100%;text-align:left;border:0;background:none;padding:7px 4px;border-top:.5px solid var(--sep);cursor:pointer}
+.cand.on{background:var(--soft);border-radius:8px}.cand .t{flex:1;min-width:0;overflow-wrap:anywhere}.cand .pr{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.empty{text-align:center;color:var(--label-2);padding:30px 10px}
+</style>
+</head>
+<body>
+<div class="app">
+  <a href="index.html">&larr; Cari barang</a>
+  <h1>Cek Harga SSH</h1>
+  <p class="sub">Unggah RKA (PDF cetak SIPD atau Excel) untuk membandingkan harga satuan dengan standar. Tahun terbaru (SSH 2027) diutamakan. File diproses di perangkat Anda, tidak dikirim ke server.</p>
+
+  <div class="card">
+    <div class="drop" id="drop"><b>Pilih atau tarik file ke sini</b>PDF, XLSX, XLS, atau CSV. Boleh lebih dari satu file.</div>
+    <input type="file" id="file" accept=".pdf,.xlsx,.xls,.csv" multiple hidden>
+    <div id="files" style="margin-top:6px"></div>
+    <div class="srcs" id="srcs"></div>
+    <p class="note">Hanya sumber yang dicentang yang dipakai sebagai pembanding. Jika barang sama ada di beberapa sumber, SSH 2027 dipilih lebih dulu.</p>
+  </div>
+
+  <div id="out"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="cek.js"></script>
+<script>
+(function(){
+'use strict';
+var D=window.SSH, $=function(s){return document.querySelector(s)};
+if(!D||!window.CEK){document.body.innerHTML='<p style="padding:28px">data.js atau cek.js gagal dimuat.</p>';return}
+var X=CEK.buildIndex(D), nf=new Intl.NumberFormat('id-ID'), rp=function(n){return (n<0?'-':'')+'Rp '+nf.format(Math.abs(Math.round(n)))};
+var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var badge=function(s){return '<span class="src s'+s+'">'+esc(D.src[s])+'</span>'};
+var entries=[], rows=[], filter='all', allowed=D.src.map(function(){return true});
+var CDN={xlsx:'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',pdf:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',worker:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'};
+var loaded={};
+function lib(k){ if(loaded[k]) return loaded[k]; return loaded[k]=new Promise(function(ok,no){var s=document.createElement('script');s.src=CDN[k];s.onload=ok;s.onerror=function(){no(new Error('Gagal memuat pustaka dari internet'))};document.head.appendChild(s)}) }
+
+$('#srcs').innerHTML=D.src.map(function(n,i){return '<label><input type="checkbox" data-s="'+i+'" checked> '+badge(i)+'</label>'}).join('');
+$('#srcs').addEventListener('change',function(e){allowed[+e.target.dataset.s]=e.target.checked;rebuild()});
+
+/* ---------- baca file ---------- */
+function readBuf(f){return new Promise(function(ok,no){var r=new FileReader();r.onload=function(){ok(r.result)};r.onerror=no;r.readAsArrayBuffer(f)})}
+async function readPdf(buf){
+  await lib('pdf');
+  try{ var b=await (await fetch(CDN.worker)).blob(); pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(b) }catch(e){ pdfjsLib.GlobalWorkerOptions.workerSrc=CDN.worker }
+  var doc=await pdfjsLib.getDocument({data:new Uint8Array(buf)}).promise, pages=[];
+  for(var p=1;p<=doc.numPages;p++){ var tc=await (await doc.getPage(p)).getTextContent();
+    pages.push(tc.items.map(function(i){return {x:i.transform[4],y:i.transform[5],s:i.str}})) }
+  return CEK.parsePdf(pages);
+}
+async function addFile(f){
+  var e={name:f.name,items:[],err:'',sheets:null,sheet:null,wb:null};
+  entries.push(e); drawFiles();
+  try{
+    var buf=await readBuf(f);
+    if(/\.pdf$/i.test(f.name)) e.items=await readPdf(buf);
+    else{ await lib('xlsx'); e.wb=XLSX.read(buf,{type:'array'}); e.sheets=e.wb.SheetNames;
+      var pick=e.sheets.filter(function(n){return /oktober/i.test(n)})[0]||e.sheets[e.sheets.length-1];
+      e.sheet=pick; parseSheet(e) }
+    if(!e.items.length&&!e.err) e.err='Tidak ada baris barang yang terbaca.';
+  }catch(x){ e.err=x.message||'Gagal membaca file' }
+  drawFiles(); rebuild();
+}
+function parseSheet(e){
+  var r=CEK.parseSheet(XLSX.utils.sheet_to_json(e.wb.Sheets[e.sheet],{header:1,defval:null}));
+  e.items=r||[]; e.err=r?'':'Kolom Uraian/Volume/Satuan/Harga Satuan tidak ditemukan pada sheet ini.';
+}
+function drawFiles(){
+  $('#files').innerHTML=entries.map(function(e,i){
+    return '<div class="file"><span class="n">'+esc(e.name)+(e.err?'<br><span style="color:var(--red)">'+esc(e.err)+'</span>':'')+'</span>'
+      +(e.sheets?'<select data-sh="'+i+'">'+e.sheets.map(function(s){return '<option'+(s===e.sheet?' selected':'')+'>'+esc(s)+'</option>'}).join('')+'</select>':'')
+      +'<span style="color:var(--label-2)">'+nf.format(e.items.length)+' baris</span><button class="btn sec" data-rm="'+i+'">Hapus</button></div>';
+  }).join('');
+}
+$('#files').addEventListener('change',function(ev){ var i=ev.target.dataset.sh; if(i==null) return; var e=entries[+i]; e.sheet=ev.target.value; parseSheet(e); drawFiles(); rebuild() });
+$('#files').addEventListener('click',function(ev){ var i=ev.target.dataset.rm; if(i==null) return; entries.splice(+i,1); drawFiles(); rebuild() });
+var drop=$('#drop'), inp=$('#file');
+drop.addEventListener('click',function(){inp.click()});
+inp.addEventListener('change',function(){Array.prototype.forEach.call(inp.files,addFile);inp.value=''});
+['dragover','dragenter'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.add('on')})});
+['dragleave','drop'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.remove('on')})});
+drop.addEventListener('drop',function(e){Array.prototype.forEach.call(e.dataTransfer.files,addFile)});
+
+/* ---------- pencocokan & status ---------- */
+function rebuild(){
+  rows=[];
+  entries.forEach(function(e){ e.items.forEach(function(q){
+    var c=CEK.match(q,X,allowed);
+    rows.push({q:q,file:e.name,c:c,sel:c.length&&c[0].score>=0.5?0:-1,manual:false});
+  })});
+  render();
+}
+function ev(r){
+  var c=r.c[r.sel]; if(!c) return {k:'none'};
+  var row=D.rows[c.i], std=row[5], d=Math.round(r.q.price-std);
+  return {k:d>0?'lebih':d<0?'bawah':'sesuai',row:row,std:std,d:d,cek:!r.manual&&c.score<0.85,sc:c.score};
+}
+var LBL={lebih:'Melebihi SSH',sesuai:'Sesuai SSH',bawah:'Di bawah SSH',none:'Tidak ditemukan'};
+function render(){
+  var out=$('#out');
+  if(!rows.length){ out.innerHTML=entries.length?'<div class="empty">Belum ada baris barang yang bisa dibaca.</div>':''; return }
+  var cnt={all:rows.length,lebih:0,sesuai:0,bawah:0,none:0,cek:0}, over=0, nOver=0;
+  var E=rows.map(function(r){var e=ev(r);cnt[e.k]++;if(e.cek)cnt.cek++;if(e.k==='lebih'){nOver++;over+=r.q.total-r.q.qty*e.std}return e});
+  var F=[['all','Semua'],['lebih','Melebihi'],['sesuai','Sesuai'],['bawah','Di bawah'],['none','Tidak ditemukan'],['cek','Perlu dicek']];
+  var h='<div class="total"><div><small>Kelebihan di atas SSH ('+nf.format(nOver)+' baris)</small><strong style="color:var(--red)">'+rp(over)+'</strong></div>'
+    +'<div><small>Total jumlah di file</small><strong>'+rp(rows.reduce(function(a,r){return a+r.q.total},0))+'</strong></div></div>'
+    +'<div class="sum">'+F.map(function(f){return '<button class="chip'+(filter===f[0]?' on':'')+'" data-f="'+f[0]+'">'+f[1]+' <b>'+nf.format(cnt[f[0]])+'</b></button>'}).join('')
+    +'<button class="btn" id="exp" style="margin-left:auto">Unduh Excel</button></div>';
+  var shown=0;
+  rows.forEach(function(r,i){
+    var e=E[i]; if(filter!=='all'&&filter!==e.k&&!(filter==='cek'&&e.cek)) return;
+    shown++; if(shown>300) return;
+    var q=r.q;
+    h+='<div class="item"><div class="top"><div><div class="nm">'+esc(q.name)+'</div>'+(q.spec?'<div class="sp">'+esc(q.spec)+'</div>':'')
+      +'<div class="meta">'+esc(r.file)+' &middot; '+esc(q.ref)+(q.rek?' &middot; '+esc(q.rek):'')+'</div></div>'
+      +'<span class="pill p-'+e.k+'">'+LBL[e.k]+'</span></div>'
+      +'<div class="cmp"><div class="r"><span>Harga di file</span><b>'+rp(q.price)+(q.unit?' / '+esc(q.unit):'')+'</b></div>';
+    if(e.k!=='none'){
+      var sd=D.rows[r.c[r.sel].i];
+      h+='<div class="r"><span>'+badge(sd[8])+'Harga SSH</span><b>'+rp(e.std)+' / '+esc(D.units[sd[4]])+'</b></div>'
+        +(e.d?'<div class="r"><span>Selisih per satuan</span><b style="color:var(--'+(e.d>0?'red':'accent')+')">'+(e.d>0?'+':'')+rp(e.d)+'</b></div>':'')
+        +(e.k==='lebih'&&q.qty?'<div class="r"><span>Jumlah menurut SSH ('+nf.format(q.qty)+' &times;)</span><b>'+rp(q.qty*e.std)+'</b></div>':'')
+        +'<div class="meta" style="margin-top:6px">'+esc(sd[2])+(sd[3]?' &middot; '+esc(sd[3]):'')+'</div>'
+        +(e.cek?'<span class="warn">Kemiripan '+Math.round(e.sc*100)+'%, mohon dicek</span>':'');
+    }
+    h+='</div>';
+    if(r.c.length) h+='<details><summary>'+(e.k==='none'?'Pilih barang yang sesuai':'Barang SSH lain')+'</summary>'
+      +r.c.map(function(c,j){var d=D.rows[c.i];return '<button class="cand'+(j===r.sel?' on':'')+'" data-r="'+i+'" data-c="'+j+'"><span class="t">'+badge(d[8])+esc(d[2])+(d[3]?' &middot; '+esc(d[3]):'')+' <span class="sp">('+esc(D.units[d[4]])+')</span></span><span class="pr">'+rp(d[5])+'</span></button>'}).join('')
+      +'<button class="cand'+(r.sel<0?' on':'')+'" data-r="'+i+'" data-c="-1"><span class="t">Bukan salah satu di atas</span></button></details>';
+    h+='</div>';
+  });
+  if(shown>300) h+='<p class="note">Menampilkan 300 baris pertama. Unduh Excel untuk semua baris.</p>';
+  if(!shown) h+='<div class="empty">Tidak ada baris untuk filter ini.</div>';
+  var keep=out.querySelectorAll('details[open]').length; out.innerHTML=h;
+}
+$('#out').addEventListener('click',function(e){
+  var b=e.target.closest('[data-f],[data-c],#exp'); if(!b) return;
+  if(b.dataset.f){filter=b.dataset.f;render()}
+  else if(b.id==='exp'){exportXlsx()}
+  else{ var r=rows[+b.dataset.r], y=window.scrollY; r.sel=+b.dataset.c; r.manual=true; render(); window.scrollTo(0,y) }
+});
+
+/* ---------- unduh hasil ---------- */
+async function exportXlsx(){
+  try{ await lib('xlsx') }catch(e){ alert(e.message); return }
+  var head=['No','File','Posisi','Kode rekening','Uraian di file','Spesifikasi di file','Satuan di file','Volume','Harga di file','Jumlah di file','Status',
+    'Perlu dicek','Barang SSH','Spesifikasi SSH','Satuan SSH','Sumber SSH','Kode barang SSH','Kode rekening SSH','Harga SSH','Selisih per satuan','Jumlah menurut SSH','Selisih jumlah'];
+  var a=[head];
+  rows.forEach(function(r,i){
+    var e=ev(r), q=r.q, d=e.row;
+    a.push([i+1,r.file,q.ref,q.rek,q.name,q.spec,q.unit,q.qty,q.price,q.total,LBL[e.k],e.cek?'Ya':'',
+      d?d[2]:'',d?d[3]:'',d?D.units[d[4]]:'',d?D.src[d[8]]:'',d?d[1]:'',d&&d[6]>=0?D.accts[d[6]]:'',
+      d?e.std:'',d?e.d:'',d?q.qty*e.std:'',d?q.total-q.qty*e.std:'']);
+  });
+  var ws=XLSX.utils.aoa_to_sheet(a), wb=XLSX.utils.book_new();
+  ws['!cols']=head.map(function(h,i){return {wch:[5,24,10,22,38,28,10,8,14,16,16,9,38,28,10,10,24,22,14,14,16,16][i]}});
+  XLSX.utils.book_append_sheet(wb,ws,'Hasil cek harga'); XLSX.writeFile(wb,'hasil_cek_harga_ssh.xlsx');
+}
+})();
+</script>
+</body>
+</html>

@@ -12,6 +12,7 @@ empat sumber data. Setiap hasil diberi tanda sumbernya. Tanpa server, tanpa buil
 
 ## File
 - `index.html` : seluruh tampilan dan logika pencarian
+- `cek.html`, `cek.js` : cek harga dari file RKA (PDF cetak SIPD atau Excel) terhadap SSH, SBU, ASB
 - `data.js` : data gabungan dari 4 file Excel (17.442 barang)
 - `update_data.py` : membuat ulang `data.js` dari file Excel
 - `.nojekyll` : agar GitHub Pages menyajikan file apa adanya
@@ -37,3 +38,9 @@ Lalu commit dan push `data.js`.
   diambil dari file lain berdasarkan kode kelompok; baris yang kembar persis dibuang.
 - Induk kode rekening (format SIPD) diambil dari `data.js` yang sudah ada. Untuk melengkapi,
   jalankan skrip dengan `--rekening daftar_rekening.xlsx` (kolom `Kode Rekening` dan `Uraian`).
+
+## Cek harga dari file
+Buka `cek.html` (ada tautan di halaman utama), unggah PDF cetak RKA SIPD atau Excel RKA.
+Setiap barang dicocokkan dengan database; SSH 2027 diutamakan bila barang yang sama ada di beberapa sumber.
+Status: Melebihi, Sesuai, Di bawah, Tidak ditemukan, dan Perlu dicek (kemiripan kurang dari 85%).
+Hasil bisa diunduh sebagai Excel. Pustaka pdf.js dan SheetJS dimuat dari cdnjs, jadi perlu koneksi internet.
